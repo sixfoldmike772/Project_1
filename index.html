@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Stock Price Prediction</title>
+</head>
+<body>
+    <h1>Stock Price Prediction</h1>
+    <form method="POST">
+        <label for="stock_ticker">Enter Stock Ticker Symbol:</label>
+        <input type="text" name="stock_ticker" id="stock_ticker" required>
+        <input type="submit" value="Predict">
+    </form>
+    
+    {% if prediction %}
+    <p>Predicted Closing Price for Tomorrow: ${{ prediction }}</p>
+    <p>Accuracy: {{ accuracy * 100 }}%</p>
+    {% endif %}
+    
+    {% if error_message %}
+    <p style="color: red;">{{ error_message }}</p>
+    {% endif %}
+</body>
+</html>
