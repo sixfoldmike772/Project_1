@@ -8,6 +8,27 @@ from prophet import Prophet
 
 app = Flask(__name__)
 
+def find_threshold(train_df, test_df):
+    lower_threshold = 0
+    upper_threshold = 10  # Adjust the upper limit as needed
+    threshold = None
+    while lower_threshold <= upper_threshold:
+        current_threshold = (lower_threshold + upper_threshold) / 2
+        model = Prophet()
+        model.fit(train_df)
+        future = pd.DataFrame({'ds': pd.date_range(start=train_df['ds'].max(), periods=60, freq='T')})
+        forecast = model.predict(future)
+        actual_values = test_df['y']
+        predicted_values = forecast['yhat']
+        accurate_predictions = sum(abs(actual_values - predicted_values) <= current_threshold)
+        accuracy = accurate_predictions / len(test_df)
+        if accuracy >= 0.8:
+            threshold = current_threshold
+            upper_threshold = current_threshold - 0.01
+        else:
+            lower_threshold = current_threshold + 0.01
+    return threshold
+
 @app.route("/", methods=["GET", "POST"])
 def stock_prediction():
     prediction = None
@@ -26,7 +47,7 @@ def stock_prediction():
                 if r.status_code == 200:
                     df = pd.read_csv(StringIO(r.text))
                     df['timestamp'] = pd.to_datetime(df['timestamp'])
-                    df = df.sort_values(by='timestamp')
+                    df = df.sort values(by='timestamp')
                     columns_to_remove = ['open', 'volume', 'high', 'low']
                     df = df.drop(columns=columns_to_remove)
                     df.rename(columns={'timestamp': 'ds', 'close': 'y'}, inplace=True)
@@ -39,26 +60,16 @@ def stock_prediction():
                     train_df = df[:-60]
                     test_df = df[-60:]
 
-                    # Initialize and fit the Prophet model
+                    # Find the threshold for 80% accuracy
+                    threshold = find_threshold(train_df, test_df)
+
                     model = Prophet()
                     model.fit(train_df)
-
-                    # Create a DataFrame with future timestamps for the next day at a per-minute frequency for the next 60 minutes
-                    tomorrow = datetime.now() + timedelta(days=1)
                     future = pd.DataFrame({'ds': pd.date_range(start=train_df['ds'].max(), periods=60, freq='T')})
-
-                    # Make predictions for the next 60 minutes using the model
                     forecast = model.predict(future)
-
-                    # Calculate accuracy based on an acceptable threshold of 1
                     actual_values = test_df['y']
                     predicted_values = forecast['yhat']
-                    threshold = 1
-
-                    # Calculate the number of accurate predictions
                     accurate_predictions = sum(abs(actual_values - predicted_values) <= threshold)
-
-                    # Calculate accuracy as the ratio of accurate predictions to the total number of predictions
                     accuracy = accurate_predictions / len(test_df)
 
                     # Calculate Mean Absolute Error (MAE)
