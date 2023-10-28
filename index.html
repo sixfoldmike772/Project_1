@@ -1,0 +1,47 @@
+<html>
+<head>
+    <title>siteKaNaam</title>
+    <link rel="stylesheet" type="text/css" href="stockSite.css" />
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="navbar">
+    <h1 class="header">
+        <img src="logo.png" class="logo">
+        <span class="headerText"></span>
+    </h1>
+
+    <ul class="topNav">
+       
+        <a href="#about">About</a>
+    </ul>
+</div>
+    <div class="tickerInput">
+        <div class="pg1">
+    <form method="POST">
+        <label for="stock_ticker"></label>
+        <div class="btn">
+        <div class="btn1">
+            <input type="text" placeholder="Type the required Ticker.."  name="stock_ticker" id="stock_ticker" required>
+        </div>
+      <div class="btn2">
+        <input type="submit" value="Predict" id="subbtn">
+      </div>
+    </div>
+    </form>
+</div>
+</div>
+    <div class="pg2">
+    {% if prediction %}
+    <p>Predicted Closing Price for Tomorrow: ${{ prediction }}</p>
+    <p>Accuracy: {{ accuracy * 100 }}%</p>
+    {% endif %}
+    
+    {% if error_message %}
+    <p style="color: red;">{{ error_message }}</p>
+    {% endif %}
+    </div>
+    <script src="stockSite.js"></script>
+</body>
+</html>
