@@ -17,6 +17,9 @@
         <a href="#about">About</a>
     </ul>
 </div>
+
+    
+</div>
     <div class="tickerInput">
         <div class="pg1">
     <form method="POST">
@@ -28,10 +31,16 @@
       <div class="btn2">
         <input type="submit" value="Predict" id="subbtn">
       </div>
+      
     </div>
     </form>
+    <div class="main">
+
+<span class="spinner spinner-large spinner-blue spinner-slow"></span>
 </div>
 </div>
+
+
     <div class="pg2">
     {% if prediction %}
     <p>Predicted Closing Price for Tomorrow: ${{ prediction }}</p>
@@ -42,6 +51,7 @@
     <p style="color: red;">{{ error_message }}</p>
     {% endif %}
     </div>
+    
     <script src="stockSite.js"></script>
 </body>
 </html>
