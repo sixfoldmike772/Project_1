@@ -1,29 +1,36 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stock Price Prediction</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="header">
+    <header class="header">
         <div class="logo">
-            <!-- Your logo content goes here -->
+            <img src="logo.png" alt="Stock Prediction Logo">
         </div>
-        <div class="topNav">
-            <a href="#">Home</a>
-            <a href="#">About</a>
-            <!-- Add more navigation links as needed -->
-        </div>
-    </div>
-    <div class="tickerInput">
-        <div class="pg1">
+        <h1>Stock Price Prediction</h1>
+    </header>
+    <div class="container">
+        <div class="pg1 tickerInput">
             <form method="POST">
+                <label for="stock_ticker">Enter Stock Ticker Symbol:</label>
                 <input type="text" name="stock_ticker" id="stock_ticker" required>
-                <button type="submit" id="subbtn"><span class="spinner"></span>Submit</button>
+                <input type="submit" value="Predict" id="subbtn">
             </form>
         </div>
         <div class="pg2">
-            <!-- Display prediction results here -->
+            {% if prediction %}
+                <h2>Prediction:</h2>
+                <p>Predicted Closing Price for Tomorrow: ${{ prediction }}</p>
+                <p>Mean Absolute Error (MAE): ${{ mae }}</p>
+            {% endif %}
+            
+            {% if error_message %}
+                <p style="color: red;">{{ error_message }}</p>
+            {% endif %}
         </div>
     </div>
 </body>
