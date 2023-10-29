@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stock Price Prediction</title>
-<link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" type="text/css" href="http://127.0.0.1:5000/static/style.css">
 </head>
 <body>
     <header class="header">
         <div class="logo">
-            <img src="logo.png" alt="Stock Prediction Logo">
+            <img src="logo.jpeg" alt="Stock Prediction Logo">
         </div>
         <h1>Stock Price Prediction</h1>
     </header>
@@ -25,7 +25,6 @@
             {% if prediction %}
                 <h2>Prediction:</h2>
                 <p>Predicted Closing Price for Tomorrow: ${{ prediction }}</p>
-                <p>Mean Absolute Error (MAE): ${{ mae }}</p>
             {% endif %}
             
             {% if error_message %}
