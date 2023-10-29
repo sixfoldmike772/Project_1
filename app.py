@@ -6,34 +6,13 @@ from datetime import datetime, timedelta
 from sklearn.metrics import mean_absolute_error
 from prophet import Prophet
 
-app = Flask(__name__)
-
-def find_threshold(train_df, test_df):
-    lower_threshold = 0
-    upper_threshold = 10  # Adjust the upper limit as needed
-    threshold = None
-    while lower_threshold <= upper_threshold:
-        current_threshold = (lower_threshold + upper_threshold) / 2
-        model = Prophet()
-        model.fit(train_df)
-        future = pd.DataFrame({'ds': pd.date_range(start=train_df['ds'].max(), periods=60, freq='T')})
-        forecast = model.predict(future)
-        actual_values = test_df['y']
-        predicted_values = forecast['yhat']
-        accurate_predictions = sum(abs(actual_values - predicted_values) <= current_threshold)
-        accuracy = accurate_predictions / len(test_df)
-        if accuracy >= 0.8:
-            threshold = current_threshold
-            upper_threshold = current_threshold - 0.01
-        else:
-            lower_threshold = current_threshold + 0.01
-    return threshold
+app = Flask(__name__, static_folder='static')  # Specify the 'static' folder
 
 @app.route("/", methods=["GET", "POST"])
 def stock_prediction():
     prediction = None
-    accuracy = None
     error_message = None
+    mae = None  # Define mae with a default value
 
     if request.method == "POST":
         symbol = request.form.get("stock_ticker")
@@ -47,7 +26,7 @@ def stock_prediction():
                 if r.status_code == 200:
                     df = pd.read_csv(StringIO(r.text))
                     df['timestamp'] = pd.to_datetime(df['timestamp'])
-                    df = df.sort values(by='timestamp')
+                    df = df.sort_values(by='timestamp')
                     columns_to_remove = ['open', 'volume', 'high', 'low']
                     df = df.drop(columns=columns_to_remove)
                     df.rename(columns={'timestamp': 'ds', 'close': 'y'}, inplace=True)
@@ -60,17 +39,12 @@ def stock_prediction():
                     train_df = df[:-60]
                     test_df = df[-60:]
 
-                    # Find the threshold for 80% accuracy
-                    threshold = find_threshold(train_df, test_df)
-
                     model = Prophet()
                     model.fit(train_df)
                     future = pd.DataFrame({'ds': pd.date_range(start=train_df['ds'].max(), periods=60, freq='T')})
                     forecast = model.predict(future)
                     actual_values = test_df['y']
                     predicted_values = forecast['yhat']
-                    accurate_predictions = sum(abs(actual_values - predicted_values) <= threshold)
-                    accuracy = accurate_predictions / len(test_df)
 
                     # Calculate Mean Absolute Error (MAE)
                     mae = mean_absolute_error(actual_values, predicted_values)
@@ -84,7 +58,7 @@ def stock_prediction():
             except Exception as e:
                 error_message = str(e)
 
-    return render_template("index.html", prediction=prediction, accuracy=accuracy, error_message=error_message)
+    return render_template("index.html", prediction=prediction, mae=mae, error_message=error_message)
 
 if __name__ == "__main__":
     app.run(debug=True)
