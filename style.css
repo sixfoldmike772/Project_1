@@ -19,9 +19,7 @@
 }
 .topNav 
 {
-    overflow: hidden;
-    
-    
+    overflow: hidden; 
 }
 
 .topNav a 
@@ -139,4 +137,3 @@ input[type="text"]
     border-top-color: #09d;
     border-left-color: #09d;
   }
-
